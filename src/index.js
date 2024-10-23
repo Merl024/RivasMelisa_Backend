@@ -35,10 +35,10 @@ app.get('/api/productos', (req, res) => {
 app.get('/api/productos/:productId', (req, res) => {
     let productId = parseInt(req.params.productId)
 
-    const product = productos.find(u => u.productId === productId)
-
+    const product = productos.find(p => p.id === productId)
+    
     if (!product){
-        res.status(404).send('Product Not Found')
+        res.status(404).send('Producto no encontrado')
     }
     
     res.send({ status: "Success", msg: "Aqui esta su producto", data: product})
@@ -64,23 +64,39 @@ app.post('/api/productos', (req, res) => {
     // Validando primero que el ID no se vaya a repetir
     const unicoId = () => {
         const numRandom = Math.floor(Math.random() * 400 + 1)
-        return product.find(p => p.id === numRandom) ? unicoId(): numRandom
+        return productos.find(p => p.id === numRandom) ? unicoId(): numRandom
     }
-
-    if (!product.title || !product.description || !product.code || !product.price || product.status || product.stock || product.stock || product.category || product.thumbnails){
+    
+    product.id = unicoId()
+    
+    if (!product.title || !product.description || !product.code || !product.price || !product.status || !product.stock || !product.category || !product.thumbnails){
         return res.status(400).send('Todos los campos son obligatorios')
     }
 
     productos.push(product)
-    res.send({status: "success", msg: "Usuario creado", data: product})
+    res.send({status: "success", msg: "Producto agregado", data: product})
+})
+
+// PUT /:pid:
+// Debe actualizar un producto por los campos enviados desde el body. No se debe actualizar ni eliminar el idal momento de hacer la actualización.
+
+app.put('/api/productos/:productId', (req,res) => {
+    let productId = parseInt(req.params.productId)
+    let prodUpdate = req.body
+
+    const posicionProd = productos.find(p => p.id === productId)
+    
+    if (posicionProd < 0) {
+        res.status(202).send('Producto no encontrado')
+    }
+    productos[posicionProd] = prodUpdate
+    console.log(productos[posicionProd]);
+    
+    res.send({ status: "Success", msg: "Sus datos han sido actualizados", data: productos[posicionProd] })
 })
 
 
 /*
-PUT /:pid:
-Debe actualizar un producto por los campos enviados desde el body. No se debe actualizar ni eliminar el idal momento de hacer la actualización.
-
-
 DELETE /:pid:
 Debe eliminar el producto con el pid indicado.
 
