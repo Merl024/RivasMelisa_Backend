@@ -27,7 +27,7 @@ const productos = []
 
 app.get('/api/productos', (req, res) => {
     res.send(productos)
-    console.log(productos);
+    // console.log(productos); // Comprobando que se esta agregando los productos
 })
 
 
@@ -59,14 +59,17 @@ stock: Number
 category: String
 thumbnails: Array de Strings (rutas donde están almacenadas las imágenes del producto).
 */
+//Asegurandonos que no se repita el ID generado
+
 app.post('/api/productos', (req, res) => {
     let product = req.body
-
+    
     // Validando primero que el ID no se vaya a repetir
     const unicoId = () => {
         const numRandom = Math.floor(Math.random() * 400 + 1)
         return productos.find(p => p.id === numRandom) ? unicoId(): numRandom
     }
+    
     
     product.id = unicoId()
     
@@ -109,47 +112,74 @@ app.delete('/api/productos/:productId', (req, res)=>{
         return res.status(202).send({ status: "failed", msg: "No se encontro el producto" })
     }
 
-    productos.splice(productId, 1)
+    productos.splice(posicionProd, 1)
 
     if (productos.length === productosSize){
         return res.status(500).send({ status: "Error", msg: "El producto no se pudo eliminar" })
     }
 
-    res.send({ status:"Success", msg: "Producto borrado con exito", data: productos[productId] })
+    res.send({ status:"Success", msg: "Producto borrado con exito", data: productos[posicionProd] })
 
 })
 
-/*
-Rutas para Manejo de Carritos (/api/carts/)
-POST /:
-Debe crear un nuevo carrito con la siguiente estructura:
-id: Number/String (Autogenerado para asegurar que nunca se dupliquen los ids).
+/* ####### Rutas para Manejo de Carritos (/api/carts/) ########## */
+// POST /:
+// Debe crear un nuevo carrito con la siguiente estructura:
+// id: Number/String (Autogenerado para asegurar que nunca se dupliquen los ids).
+// products: Array que contendrá objetos que representen cada producto.
 
-products: Array que contendrá objetos que representen cada producto.
+const carts = []
 
+app.get('/api/carts', (req, res) => {
+    res.send(carts)
+})
 
+app.post('/api/carts', (req, res) => {
 
-GET /:cid:
-Debe listar los productos que pertenecen al carrito con el cid proporcionado.
+    const unicoId = () => {
+        const numRandom = Math.floor(Math.random() * 400 + 1)
+        return carts.find(c => c.id === numRandom) ? unicoId(): numRandom
+    }
+    
+    const newCart = {
+        id: unicoId(),
+        productos: []    
+    }
 
+    carts.push(newCart)
+    res.send({ status: "Success", msg: "El producto ha sido agregado al carrito", data: newCart })
 
+})
+
+// GET /:cid:
+// Debe listar los productos que pertenecen al carrito con el cid proporcionado.
+
+app.get('/api/carts/:cartId', (req, res) => {
+    let cartId = parseInt(req.params.cartId)
+    let cart = carts.find(c => c.id === cartId)
+
+    if(!cart){
+        res.status(404).send("Carrito no encontrado")
+    }
+    
+    res.send({ status: "Success", msg: "Carrito encontrado", data: cart })
+})
+
+/* 
 POST /:cid/product/:pid:
 Debe agregar el producto al arreglo products del carrito seleccionado, utilizando el siguiente formato:
 product: Solo debe contener el ID del producto.
-
 quantity: Debe contener el número de ejemplares de dicho producto (se agregará de uno en uno).
-
-
 Si un producto ya existente intenta agregarse, se debe incrementar el campo quantity de dicho producto.
+*/
 
 
-Persistencia de la Información
-La persistencia se implementará utilizando el sistema de archivos, donde los archivos products.json y carts.json respaldarán la información.
 
+/* Persistencia de la Información
+La persistencia se implementará utilizando el sistema de archivos, 
+donde los archivos products.json y carts.json respaldarán la información.
 Se debe utilizar el ProductManager desarrollado en el desafío anterior y 
 crear un CartManager para gestionar el almacenamiento de estos archivos JSON.
-
-
 */
 
 
