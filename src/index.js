@@ -27,6 +27,7 @@ const productos = []
 
 app.get('/api/productos', (req, res) => {
     res.send(productos)
+    console.log(productos);
 })
 
 
@@ -84,23 +85,41 @@ app.put('/api/productos/:productId', (req,res) => {
     let productId = parseInt(req.params.productId)
     let prodUpdate = req.body
 
-    const posicionProd = productos.find(p => p.id === productId)
+    const posicionProd = productos.findIndex(p => p.id === productId)
     
     if (posicionProd < 0) {
         res.status(202).send('Producto no encontrado')
     }
     productos[posicionProd] = prodUpdate
-    console.log(productos[posicionProd]);
     
     res.send({ status: "Success", msg: "Sus datos han sido actualizados", data: productos[posicionProd] })
 })
 
 
+// DELETE /:pid:
+// Debe eliminar el producto con el pid indicado.
+
+app.delete('/api/productos/:productId', (req, res)=>{
+    let productId = parseInt(req.params.productId)
+
+    const productosSize = productos.length
+    const posicionProd = productos.findIndex(p => p.id === productId)
+
+    if (posicionProd < 0){
+        return res.status(202).send({ status: "failed", msg: "No se encontro el producto" })
+    }
+
+    productos.splice(productId, 1)
+
+    if (productos.length === productosSize){
+        return res.status(500).send({ status: "Error", msg: "El producto no se pudo eliminar" })
+    }
+
+    res.send({ status:"Success", msg: "Producto borrado con exito", data: productos[productId] })
+
+})
+
 /*
-DELETE /:pid:
-Debe eliminar el producto con el pid indicado.
-
-
 Rutas para Manejo de Carritos (/api/carts/)
 POST /:
 Debe crear un nuevo carrito con la siguiente estructura:
