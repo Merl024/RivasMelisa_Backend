@@ -172,6 +172,35 @@ product: Solo debe contener el ID del producto.
 quantity: Debe contener el número de ejemplares de dicho producto (se agregará de uno en uno).
 Si un producto ya existente intenta agregarse, se debe incrementar el campo quantity de dicho producto.
 */
+// POST /:cid/product/:pid
+// Debe agregar el producto al arreglo productos del carrito seleccionado,
+// Si un producto ya existente intenta agregarse, se debe incrementar el campo quantity de dicho producto.
+
+app.post('/api/carts/:cartId/productos/:productoId', (req, res) => {
+    let cartId = parseInt(req.params.cartId)
+    const cart = carts.find(c => c.id === cartId)
+
+    if (!cart) {
+        return res.status(404).send({ status: "Error", msg: "Carrito no encontrado" })
+    }
+
+    let productId = parseInt(req.params.productoId)
+    let product = cart.productos.find(p => p.id === productId)
+
+    if (product) {
+        product.quantity += 1
+        return res.send({ status: "Success", msg: "Producto ya existente, cantidad incrementada", data: product })
+    }
+
+    // Agregando el id del producto al carrito que seleccionamos
+    cart.productos.push({ id: productId, quantity: 1 })
+
+    if (!product) {
+        return res.status(500).send({ status: "Error", msg: "Fallo al agregar el producto al carrito" })
+    }
+
+    res.send({ status: "Success", msg: "Producto agregado al carrito", data: product })
+})
 
 
 
