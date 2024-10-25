@@ -8,6 +8,7 @@
  Se deben disponer dos grupos de rutas: /products y /carts. 
  Estos endpoints estarán implementados con el router de Express, con las siguientes especificaciones:
  */
+
 import express from 'express'
 const app = express()
 const PORT = 8080
