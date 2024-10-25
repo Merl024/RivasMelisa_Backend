@@ -10,13 +10,18 @@
  */
 
 import express from 'express'
+import ProductManager from './productManager'
+import CartManager from './cartManager'
 const app = express()
 const PORT = 8080
-
 
 // Middleware
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+const productManager = new ProductManager('./productos.json')
+const cartManager = new CartManager('./carts.json')
+
 
 /*
 Rutas para Manejo de Productos (/api/products/)
@@ -24,27 +29,32 @@ GET /:
 Debe listar todos los productos de la base de datos.
 */
 
-const productos = []
-
-app.get('/api/productos', (req, res) => {
-    res.send(productos)
-    // console.log(productos); // Comprobando que se esta agregando los productos
+app.get('/api/productos', async (req, res) => {
+    try {
+        const productos = await productManager.getProducts()
+        res.send({status: "Success", data: productos})
+    } catch (error) {
+        res.status(500).send('Error obtenido', error)
+    }
 })
 
 
 //GET /:pid:
 //Debe traer solo el producto con el id proporcionado.
-app.get('/api/productos/:productId', (req, res) => {
-    let productId = parseInt(req.params.productId)
+app.get('/api/productos/:productId', async (req, res) => {
+    try {
+        let productId = parseInt(req.params.productId)
+        const productos = await productManager.getProducts()
+        const product = productos.find(p => p.id === productId)
+        
+        if(!product){
+            return res.status(404).send('Producto no encontrado')
+        }
 
-    const product = productos.find(p => p.id === productId)
-    
-    if (!product){
-        res.status(404).send('Producto no encontrado')
+        res.send({status: "Success", msg: "Producto encontrado", data: product})
+    } catch (error) {
+        res.status(500).send('Error al buscar producto', error)
     }
-    
-    res.send({ status: "Success", msg: "Aqui esta su producto", data: product})
-
 })
 
 /*
@@ -62,42 +72,44 @@ thumbnails: Array de Strings (rutas donde están almacenadas las imágenes del p
 */
 //Asegurandonos que no se repita el ID generado
 
-app.post('/api/productos', (req, res) => {
+app.post('/api/productos', async (req, res) => {
     let product = req.body
-    
-    // Validando primero que el ID no se vaya a repetir
-    const unicoId = () => {
-        const numRandom = Math.floor(Math.random() * 400 + 1)
-        return productos.find(p => p.id === numRandom) ? unicoId(): numRandom
-    }
-    
-    
-    product.id = unicoId()
     
     if (!product.title || !product.description || !product.code || !product.price || !product.status || !product.stock || !product.category || !product.thumbnails){
         return res.status(400).send('Todos los campos son obligatorios')
     }
 
-    productos.push(product)
-    res.send({status: "success", msg: "Producto agregado", data: product})
+    try {
+        const productos = await productManager.getProducts()
+        // Validando primero que el ID no se vaya a repetir
+        const unicoId = () => {
+            const numRandom = Math.floor(Math.random() * 400 + 1)
+            return productos.find(p => p.id === numRandom) ? unicoId(): numRandom
+        }
+        
+        product.id = unicoId()
+        
+        await productManager.agregarProductos(product)
+        res.send({status: "success", msg: "Producto agregado", data: product})
+    } catch (error) {
+        res.status(500).send('Error al agregar el producto')
+    }
 })
 
 // PUT /:pid:
 // Debe actualizar un producto por los campos enviados desde el body. No se debe actualizar ni eliminar el idal momento de hacer la actualización.
 
-app.put('/api/productos/:productId', (req,res) => {
-    let productId = parseInt(req.params.productId)
-    let prodUpdate = req.body
-
-    const posicionProd = productos.findIndex(p => p.id === productId)
-    
-    if (posicionProd < 0) {
-        res.status(202).send('Producto no encontrado')
-    }
-    productos[posicionProd] = prodUpdate
-    
-    res.send({ status: "Success", msg: "Sus datos han sido actualizados", data: productos[posicionProd] })
-})
+// app.put('/api/productos/:productId', async (req,res) => {
+//     let productId = parseInt(req.params.productId)
+//     let prodUpdate = req.body
+//     try {
+//         await productManager.putProducts(productId, prodUpdate)
+//         res.send({ status: "Success", msg: "Sus datos han sido actualizados", data: productos[posicionProd] })
+        
+//     } catch (error) {
+        
+//     }
+// })
 
 
 // DELETE /:pid:
