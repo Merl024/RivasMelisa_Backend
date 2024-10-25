@@ -1,4 +1,4 @@
-const fs = require('fs')
+import fs from 'fs/promises'
 
 class CartManager{
     constructor(path){
@@ -55,4 +55,4 @@ class CartManager{
     }
 }
 
-export default CartManager
+export default CartManager;
