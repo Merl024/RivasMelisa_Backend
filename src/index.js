@@ -1,4 +1,9 @@
-/**Descripción General
+/**
+ * ************************************************
+ * **************** Melisa Rivas ******************
+ * ************************************************
+ * 
+ * Descripción General
  Desarrollar un servidor que contenga los endpoints y servicios necesarios para gestionar 
  los productos y carritos de compra para tu API.
  
@@ -75,7 +80,7 @@ thumbnails: Array de Strings (rutas donde están almacenadas las imágenes del p
 app.post('/api/productos', async (req, res) => {
     let product = req.body
     
-    if (!product.title || !product.description || !product.code || !product.price || !product.status || !product.stock || !product.category || !product.thumbnails){
+    if (!product.title || !product.description || !product.code || !product.price || !product.category || !product.thumbnails){
         return res.status(400).send('Todos los campos son obligatorios')
     }
 
@@ -89,7 +94,7 @@ app.post('/api/productos', async (req, res) => {
         product.id = unicoId()
         
         await productManager.agregarProductos(product)
-        res.send({status: "success", msg: "Producto agregado", data: product})
+        res.send({status: "Success", msg: "Producto agregado", data: product})
     } catch (error) {
         res.status(500).send('Error al agregar el producto')
     }
@@ -118,8 +123,11 @@ app.delete('/api/productos/:productId', async (req, res)=>{
     let productId = parseInt(req.params.productId)
 
     try {
-        await productManager.deleteProduct(productId)
-        res.send({ status:"Success", msg: "Producto borrado con exito", data: productos[posicionProd] })
+        const productDeleted = await productManager.deleteProduct(productId)
+        if (!productDeleted) {
+            return res.status(404).send({ status: "Error", message: "Producto no encontrado" });
+        }
+        res.send({ status: "Success", message: "Producto eliminado", data: productDeleted });
         
     } catch (error) {
         res.status(500).send('Error al eliminar el producto', error)

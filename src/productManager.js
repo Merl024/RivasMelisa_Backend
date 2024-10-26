@@ -52,9 +52,22 @@ class ProductManager{
     }
 
     async deleteProduct(productId){
-        const productos = await this.getProducts()
-        const deleteProd = productos.filter(p => p.id !== productId)
-        await this.postProducts(deleteProd)
+        try {
+            const productos = await this.getProducts()
+            const productosLength = productos.length
+            const deleteProd = productos.filter(p => p.id !== productId)
+
+            if (deleteProd.length === productosLength) {
+                return false
+            }
+    
+            await this.postProducts(deleteProd)
+            return true
+            
+        } catch (error) {
+            console.log('Error al eliminar el producto',error);
+            
+        }
     }
 
 }

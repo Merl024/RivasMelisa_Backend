@@ -1,0 +1,58 @@
+[
+  {
+    "title": "Audífonos Sony WH-1000XM5",
+    "description": "Audífonos inalámbricos con cancelación de ruido de última generación.",
+    "code": "SONY-WH1000XM5",
+    "price": 349,
+    "status": true,
+    "stock": 12,
+    "category": "Audífonos.",
+    "thumbnails": [
+      "Sony.jpg",
+      "SONY-WH1000XM5.jpg"
+    ],
+    "id": 300
+  },
+  {
+    "title": "Apple MacBook Air M1",
+    "description": "Laptop ultraligera con procesador Apple M1 y pantalla de 13 pulgadas.",
+    "code": "MACBOOKAIRM1",
+    "price": 999,
+    "status": true,
+    "stock": 20,
+    "category": "Computadoras portátiles",
+    "thumbnails": [
+      "macbookair_front.jpg",
+      "macbookair_side.jpg"
+    ],
+    "id": 385
+  },
+  {
+    "title": "Monitor LG UltraWide 34''",
+    "description": "Monitor de pantalla ultra ancha con resolución 3440x1440.",
+    "code": "LGULTRA34",
+    "price": 499,
+    "status": true,
+    "stock": 10,
+    "category": "Monitores.",
+    "thumbnails": [
+      "lg34_front.jpg",
+      "lg34_back.jpg"
+    ],
+    "id": 189
+  },
+  {
+    "title": "Laptop HP Envy 13",
+    "description": "Laptop ultradelgada con procesador Intel i7, pantalla de 13 pulgadas.",
+    "code": "LHPEN13",
+    "price": 1200,
+    "status": true,
+    "stock": 25,
+    "category": "Computadoras portátiles.",
+    "thumbnails": [
+      "envy13_front.jpg",
+      "envy13_back.jpg"
+    ],
+    "id": 158
+  }
+]

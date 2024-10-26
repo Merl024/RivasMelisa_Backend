@@ -36,23 +36,28 @@ class CartManager{
         return carts.findIndex(c => c.id === cartId)
     }
 
-    async addProductoCart(cartId, productId){
-        const cart = await this.getCartById(cartId)
-
-        if(!cart){
-            throw Error('Carrito no encontrado')
+    async addProductoCart(cartId, productId) {
+        const carts = await this.getCarts();
+        const cartIndex = carts.findIndex(c => c.id === cartId);
+    
+        if (cartIndex === -1) {
+            throw Error('Carrito no encontrado');
         }
-
-        const producto = cart.productos.findIndex(p => p.id === productId)
-        
-        if (producto >= 0){
-            cart.productos[producto].quantity += 1
-        }else{
-            cart.productos.push({id: productId, quantity: 1})
+    
+        const cart = carts[cartIndex];
+        const productIndex = cart.productos.findIndex(p => p.id === productId);
+    
+        if (productIndex >= 0) {
+            cart.productos[productIndex].quantity += 1;
+        } else {
+            cart.productos.push({ id: productId, quantity: 1 });
         }
-
-        await this.postCarts()
+    
+        carts[cartIndex] = cart;
+    
+        await this.postCarts(carts);
     }
+    
 }
 
 export default CartManager;
